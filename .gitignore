@@ -1,0 +1,34 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# .NET
+**/bin/
+**/obj/
+
+# Optimizely generated data
+**/App_Data/
+**/modules/_protected/
+
+# SQL Server local database
+*.mdf
+*.ldf
+
+# React / Next.js
+**/node_modules/
+**/.next/
+**/dist/
+**/out/
+**/coverage/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+**/secrets.json
+**/appsettings.Development.json
+
+# Temporary files
+*.log
+*.tmp
