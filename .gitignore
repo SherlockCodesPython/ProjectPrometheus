@@ -32,3 +32,5 @@
 # Temporary files
 *.log
 *.tmp
+
+Backend/log.txt
