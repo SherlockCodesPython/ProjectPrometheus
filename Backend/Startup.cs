@@ -27,7 +27,7 @@ public class Startup
         services
             .AddCmsAspNetIdentity<ApplicationUser>()
             .AddCms()
-            .AddAdminUserRegistration()
+            //.AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
         services.AddContentDeliveryApi();
 
@@ -36,7 +36,8 @@ public class Startup
             options.AddPolicy("Frontend", policy =>
             {
                 policy
-                    .WithOrigins("http://localhost:3000")
+                    .WithOrigins("http://localhost:3000", "https://project-prometheus-dun.vercel.app")
+
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });

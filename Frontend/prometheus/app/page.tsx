@@ -6,11 +6,14 @@ export default function Home() {
   const [title, setTitle] = useState("Loading...");
 
   useEffect(() => {
-    fetch("https://localhost:5000/api/episerver/v3.0/content/9", {
-      headers: {
-        "Accept-Language": "en",
-      },
-    })
+    fetch(
+      "https://complex-model-picks-vampire.trycloudflare.com/api/episerver/v3.0/content/8?language=en",
+      {
+        headers: {
+          "Accept-Language": "en",
+        },
+      }
+    )
       .then((response) => {
         if (!response.ok) {
           throw new Error(`API error: ${response.status}`);
