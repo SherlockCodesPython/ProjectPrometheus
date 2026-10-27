@@ -1,37 +1,45 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
-type Lesson = {
+type HomePageContent = {
   name: string;
-  lessonNumber?: { value: number | null };
-  learningObjectives?: { value: string | null };
-  estimatedMinutes?: { value: number | null };
-  lessonContent?: { value: string | null };
+  topicHeading?: { value: string | null };
+  description?: { value: string | null };
+  mainBody?: { value: string | null };
 };
 
-// Display CMS HTML as plain text for this first version.
+// Convert CMS HTML into readable text while retaining line breaks.
 function toPlainText(html: string | null | undefined) {
   if (!html) return "";
 
   const document = new DOMParser().parseFromString(html, "text/html");
+
+  document.querySelectorAll("br").forEach((element) => {
+    element.replaceWith(document.createTextNode("\n"));
+  });
+
+  document.querySelectorAll("p").forEach((element) => {
+    element.appendChild(document.createTextNode("\n\n"));
+  });
+
   return document.body.textContent?.trim() || "";
 }
 
 export default function Home() {
-  const [lesson, setLesson] = useState<Lesson | null>(null);
-  const [objectives, setObjectives] = useState("");
-  const [content, setContent] = useState("");
-  const [error, setError] = useState("");
+  const [page, setPage] = useState<HomePageContent | null>(null);
+  const [body, setBody] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const controller = new AbortController();
 
-    async function loadLesson() {
+    async function loadHomePage() {
       try {
         const response = await fetch(
-          "https://complex-model-picks-vampire.trycloudflare.com/api/episerver/v3.0/content/8?language=en",
+          "https://due-commonly-parts-chi.trycloudflare.com/api/episerver/v3.0/content/5?language=en",
           {
             headers: {
               "Accept-Language": "en",
@@ -42,19 +50,18 @@ export default function Home() {
         );
 
         if (!response.ok) {
-          throw new Error(`Unable to load lesson: ${response.status}`);
+          throw new Error(`Unable to load home page: ${response.status}`);
         }
 
-        const data: Lesson = await response.json();
+        const data: HomePageContent = await response.json();
 
-        setLesson(data);
-        setObjectives(toPlainText(data.learningObjectives?.value));
-        setContent(toPlainText(data.lessonContent?.value));
+        setPage(data);
+        setBody(toPlainText(data.mainBody?.value));
       } catch (error) {
         if (controller.signal.aborted) return;
 
         setError(
-          error instanceof Error ? error.message : "Unable to load lesson."
+          error instanceof Error ? error.message : "Unable to load home page."
         );
       } finally {
         if (!controller.signal.aborted) {
@@ -63,7 +70,7 @@ export default function Home() {
       }
     }
 
-    loadLesson();
+    loadHomePage();
 
     return () => controller.abort();
   }, []);
@@ -71,7 +78,7 @@ export default function Home() {
   return (
     <main
       style={{
-        maxWidth: 900,
+        maxWidth: 960,
         margin: "40px auto",
         padding: "0 24px",
         fontFamily: "Arial, sans-serif",
@@ -86,40 +93,28 @@ export default function Home() {
         }}
       >
         <strong>Project Prometheus</strong>
-        <p>Learn Optimizely CMS</p>
       </header>
 
-      {loading && <p role="status">Loading lesson...</p>}
-
+      {loading && <p role="status">Loading home page...</p>}
       {error && <p role="alert">{error}</p>}
 
-      {!loading && !error && lesson && (
-        <article>
-          {lesson.lessonNumber?.value != null && (
-            <p>Lesson {lesson.lessonNumber.value}</p>
-          )}
-
-          <h1>{lesson.name}</h1>
-
-          {lesson.estimatedMinutes?.value != null &&
-            lesson.estimatedMinutes.value > 0 && (
-              <p>
-                Estimated reading time: {lesson.estimatedMinutes.value} minutes
-              </p>
-            )}
-
-          <section style={{ marginTop: 32 }}>
-            <h2>Learning objectives</h2>
-            <p>{objectives || "Learning objectives will be added soon."}</p>
+      {!loading && !error && page && (
+        <>
+          <section>
+            <h1>{page.topicHeading?.value || page.name}</h1>
+            <p>{page.description?.value}</p>
           </section>
 
           <section style={{ marginTop: 32 }}>
-            <h2>Lesson content</h2>
-            <p style={{ whiteSpace: "pre-wrap" }}>
-              {content || "Lesson content will be added soon."}
-            </p>
+            <h2>About this learning portal</h2>
+            <p style={{ whiteSpace: "pre-wrap" }}>{body}</p>
           </section>
-        </article>
+
+          <section style={{ marginTop: 40 }}>
+            <h2>Start learning</h2>
+            <Link href="/overview">Optimizely CMS Overview →</Link>
+          </section>
+        </>
       )}
     </main>
   );
